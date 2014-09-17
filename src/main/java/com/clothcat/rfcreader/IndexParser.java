@@ -1,12 +1,17 @@
 package com.clothcat.rfcreader;
 
+import com.clothcat.rfcreader.entities.AUTHORS;
+import com.clothcat.rfcreader.entities.OBSOLETES;
+import com.clothcat.rfcreader.entities.RFC_INDEX;
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 /**
  * Parses and persists the index file
@@ -15,12 +20,16 @@ import java.util.regex.Pattern;
  */
 public class IndexParser {
 
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("PUnit");
+    EntityManager em = emf.createEntityManager();
     boolean in_preamble = true;
 
     public void parse() throws Exception {
         // TODO -- don't throw anything -- catch and handle gracefully
         File f = new File("rfc-index.txt");
         Scanner sc = new Scanner(f);
+        // whilst developing.testing only do the first few
+        int i = 0;
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
             if (in_preamble) {
@@ -36,18 +45,26 @@ public class IndexParser {
                 chunk = chunk + " " + line;
                 line = sc.nextLine().trim();
             }
+            i++;
+            if (i > 10000) {
+                break;
+            }
             parseChunk(chunk);
         }
     }
 
-    private void parseChunk(String chunk) throws ParseException {
-        Integer rfcnum;
+    /* Horrible and evil "by hand" parsing...works pretty well though :) */
+    private void parseChunk(String chunk) {
+
+        Integer rfcnum = null;
         String title = null;
-        String authors = null;
+        String authorstring = null;
+        List<String> authors = new ArrayList<>();
         String date = null;
         String status = null;
         String format = null;
-        String obsoletes = null;
+        String obsoletesstring;
+        List<String> obsoletes = new ArrayList<>();
         String obsoletedBy = null;
         String updatedBy = null;
         String updates = null;
@@ -69,7 +86,15 @@ public class IndexParser {
             Matcher m = datePattern.matcher(chunk);
             if (m.find()) {
                 int pos2 = m.start();
-                authors = chunk.substring(0, pos2).trim();
+                authorstring = chunk.substring(0, pos2).trim();
+                if (authorstring.contains(",")) {
+                    String[] s = authorstring.split(",");
+                    for (String a : s) {
+                        authors.add(a);
+                    }
+                } else {
+                    authors.add(authorstring);
+                }
                 int pos3 = m.end();
                 date = chunk.substring(pos2, pos3).trim();
                 chunk = chunk.substring(pos3).trim();
@@ -89,7 +114,16 @@ public class IndexParser {
                     chunk = chunk.substring(pos4 + 1).trim();
                 } else if (chunk.substring(1).toUpperCase().startsWith("OBSOLETES")) {
                     int pos4 = chunk.indexOf(")");
-                    obsoletes = chunk.substring(1, pos4);
+                    obsoletesstring = chunk.substring(1, pos4);
+                    obsoletesstring = obsoletesstring.replace("Obsoletes", "").trim();
+                    if (obsoletesstring.contains(",")) {
+                        String[] s = obsoletesstring.split(",");
+                        for (String o : s) {
+                            obsoletes.add(o);
+                        }
+                    } else {
+                        obsoletes.add(obsoletesstring);
+                    }
                     chunk = chunk.substring(pos4 + 1).trim();
                 } else if (chunk.substring(1).toUpperCase().startsWith("UPDATED BY")) {
                     int pos4 = chunk.indexOf(")");
@@ -105,12 +139,40 @@ public class IndexParser {
                     chunk = chunk.substring(pos4 + 1).trim();
                 }
             }
+            em.getTransaction().begin();
+            RFC_INDEX ri = new RFC_INDEX();
+            ri.setId(rfcnum);
+            for (String s : authors) {
+                AUTHORS a = new AUTHORS();
+                a.setRfcId(rfcnum);
+                a.setAuthor(s.trim());
+                em.persist(a);
+            }
+            ri.setIssueDate(date);
+            ri.setStatus(status);
+            ri.setTitle(title);
+            ri.setAlso(also);
+            ri.setObsoletedBy(obsoletedBy);
+            for (String s : obsoletes) {
+                if (s.contains("RFC")) {
+                    // since not all Obsoletes are RFCs...
+                    OBSOLETES o = new OBSOLETES();
+                    o.setRfcId(rfcnum);
+                    o.setObsoletesId(Long.parseLong(s.replace("RFC", "").trim()));
+                    em.persist(o);
+                }
+            }
+            ri.setUpdatedBy(updatedBy);
+            ri.setUpdates(updates);
+            em.persist(ri);
+            em.getTransaction().commit();
 
-            System.out.println("" + rfcnum + "::" + title + "::" + authors
+            System.out.println("" + rfcnum + "::" + title + "::" + authorstring
                     + "::" + date + "::" + format + "::" + obsoletedBy + "::"
                     + obsoletes + "::" + updatedBy + "::" + updates + "\n" + chunk + "\n");
         }
     }
+    /* temp main for testing */
 
     public static void main(String[] args) throws Exception {
         IndexParser ip = new IndexParser();

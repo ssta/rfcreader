@@ -3,6 +3,8 @@
   <persistence-unit name="PUnit" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.clothcat.rfcreader.entities.RFC_INDEX</class>
+    <class>com.clothcat.rfcreader.entities.AUTHORS</class>
+    <class>com.clothcat.rfcreader.entities.OBSOLETES</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:sqlite:rfcreader.db"/>
       <property name="javax.persistence.jdbc.password" value=""/>

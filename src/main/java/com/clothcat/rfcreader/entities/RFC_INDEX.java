@@ -1,13 +1,9 @@
 package com.clothcat.rfcreader.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
 
 /**
  *
@@ -35,10 +31,13 @@ public class RFC_INDEX implements Serializable {
     @Id
     private Integer id;
     private String title;
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Date issueDate;
-    private String authors;
+    private String issueDate;
     private String status;
+    private String obsoletes;
+    private String obsoletedBy;
+    private String updatedBy;
+    private String updates;
+    private String also;
 
     public Integer getId() {
         return id;
@@ -51,7 +50,7 @@ public class RFC_INDEX implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (getId() != null ? getId().hashCode() : 0);
         return hash;
     }
 
@@ -62,7 +61,7 @@ public class RFC_INDEX implements Serializable {
             return false;
         }
         RFC_INDEX other = (RFC_INDEX) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.getId() == null && other.getId() != null) || (this.getId() != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -70,7 +69,7 @@ public class RFC_INDEX implements Serializable {
 
     @Override
     public String toString() {
-        return "com.clothcat.rfcreader.entities.RFC_INDEX[ id=" + id + " ]";
+        return "com.clothcat.rfcreader.entities.RFC_INDEX[ id=" + getId() + " ]";
     }
 
     /**
@@ -90,29 +89,15 @@ public class RFC_INDEX implements Serializable {
     /**
      * @return the issueDate
      */
-    public Date getIssueDate() {
+    public String getIssueDate() {
         return issueDate;
     }
 
     /**
      * @param issueDate the issueDate to set
      */
-    public void setIssueDate(Date issueDate) {
+    public void setIssueDate(String issueDate) {
         this.issueDate = issueDate;
-    }
-
-    /**
-     * @return the authors
-     */
-    public String getAuthors() {
-        return authors;
-    }
-
-    /**
-     * @param authors the authors to set
-     */
-    public void setAuthors(String authors) {
-        this.authors = authors;
     }
 
     /**
@@ -127,5 +112,75 @@ public class RFC_INDEX implements Serializable {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * @return the obsoletes
+     */
+    public String getObsoletes() {
+        return obsoletes;
+    }
+
+    /**
+     * @param obsoletes the obsoletes to set
+     */
+    public void setObsoletes(String obsoletes) {
+        this.obsoletes = obsoletes;
+    }
+
+    /**
+     * @return the obsoletedBy
+     */
+    public String getObsoletedBy() {
+        return obsoletedBy;
+    }
+
+    /**
+     * @param obsoletedBy the obsoletedBy to set
+     */
+    public void setObsoletedBy(String obsoletedBy) {
+        this.obsoletedBy = obsoletedBy;
+    }
+
+    /**
+     * @return the updatedBy
+     */
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    /**
+     * @param updatedBy the updatedBy to set
+     */
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    /**
+     * @return the updates
+     */
+    public String getUpdates() {
+        return updates;
+    }
+
+    /**
+     * @param updates the updates to set
+     */
+    public void setUpdates(String updates) {
+        this.updates = updates;
+    }
+
+    /**
+     * @return the also
+     */
+    public String getAlso() {
+        return also;
+    }
+
+    /**
+     * @param also the also to set
+     */
+    public void setAlso(String also) {
+        this.also = also;
     }
 }
