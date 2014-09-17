@@ -6,7 +6,10 @@
 package com.clothcat.rfcreader;
 
 import com.clothcat.rfcreader.entities.RFC_INDEX;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Date;
+import java.util.Scanner;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -17,8 +20,10 @@ import javax.persistence.Persistence;
  */
 public class Foo {
 
-    public static void main(String[] args) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("PUnit");
+    public static void main(String[] args) throws Exception {
+        IndexParser ip = new IndexParser();
+        ip.parse();
+        /*EntityManagerFactory emf = Persistence.createEntityManagerFactory("PUnit");
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         RFC_INDEX ri = new RFC_INDEX();
@@ -28,6 +33,6 @@ public class Foo {
         ri.setStatus("UNKNOWN");
         ri.setTitle("Host Software");
         em.persist(ri);
-        em.getTransaction().commit();
+        em.getTransaction().commit();*/
     }
 }
