@@ -23,34 +23,16 @@
  */
 package com.clothcat.rfcreader;
 
-import com.clothcat.rfcreader.entities.RFC_INDEX;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Date;
-import java.util.Scanner;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import com.clothcat.rfcreader.network.RfcFetcher;
 
-/**
+/** Test class that will go away once the project is done.
  *
+ * TODO -- ONLY FOR USE DORUNG DEVVELOPMENT
  * @author ssta
  */
 public class Foo {
 
     public static void main(String[] args) throws Exception {
-        IndexParser ip = new IndexParser();
-        ip.parse();
-        /*EntityManagerFactory emf = Persistence.createEntityManagerFactory("PUnit");
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        RFC_INDEX ri = new RFC_INDEX();
-        ri.setId(1);
-        ri.setAuthors("S. Crocker");
-        ri.setIssueDate(new Date(1969, 3, 1));
-        ri.setStatus("UNKNOWN");
-        ri.setTitle("Host Software");
-        em.persist(ri);
-        em.getTransaction().commit();*/
+        RfcFetcher.fetchRfc(1918);
     }
 }

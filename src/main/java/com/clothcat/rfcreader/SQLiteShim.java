@@ -34,6 +34,8 @@ import java.util.logging.Logger;
  * Singleton utility class to abstract all of the database stuff in one place.
  *
  * @author ssta
+ * @deprecated since we'e using the XML file now and (probably) won't need a
+ * database at all
  */
 public class SQLiteShim {
 

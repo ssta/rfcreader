@@ -126,13 +126,4 @@ public class RfcFetcher {
             Logger.getLogger(RfcFetcher.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    // fake main for ease of testing stubs
-    public static void main(String[] args) {
-        try {
-            fetchRfc(7330);
-        } catch (FileAlreadyExistsException ex) {
-            Logger.getLogger(RfcFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }
