@@ -45,7 +45,7 @@ public class Constants {
      * Location of the RFC index XML file. TODO -- make this a configuration
      * item so it can be changed by the user
      */
-    public static final String RFC_INDEX_URL = "ftp://ftp.ietf.org/ietf-online-proceedings/RFCs_with_extra_files/rfc-index.xml";
+    public static final String RFC_INDEX_URL = "ftp://ftp.rfc-editor.org/in-notes/rfc-index.xml";
     /**
      * RFC Index XSML file local filename
      */

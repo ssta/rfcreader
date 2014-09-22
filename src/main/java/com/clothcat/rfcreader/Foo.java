@@ -24,6 +24,8 @@
 package com.clothcat.rfcreader;
 
 import com.clothcat.rfcreader.network.RfcFetcher;
+import java.util.List;
+import org.rfc_editor.rfc_index.RfcEntry;
 
 /**
  * Test class that will go away once the project is done.
@@ -35,7 +37,14 @@ import com.clothcat.rfcreader.network.RfcFetcher;
 public class Foo {
 
     public static void main(String[] args) throws Exception {
-        RfcFetcher.fetchRfc(1918);
-        RfcFetcher.fetchRfc(1918);
+        XmlHelper instance = XmlHelper.getInstance();
+        List<RfcEntry> filteredList = instance.filteredListByTitle(new String[]{"TLS"});
+        System.out.println("Filtered List size is: " + filteredList.size());
+
+        filteredList = instance.filteredListByTitle(new String[]{"TLS", "dtls"});
+        System.out.println("Filtered List size is: " + filteredList.size());
+
+        filteredList = instance.filteredListByTitle(new String[]{""});
+        System.out.println("Filtered List size is: " + filteredList.size());
     }
 }

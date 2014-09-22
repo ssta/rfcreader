@@ -79,7 +79,7 @@ public class RfcFetcher {
     private static void fetchIndexUnsafely(String url) {
         // TODO handle exceptions better
         try {
-            File f = new File("rfc-index.xml");
+            File f = new File(Constants.RFC_INDEX_LOCAL_NAME);
             if (f.exists()) {
                 f.delete();
             }
