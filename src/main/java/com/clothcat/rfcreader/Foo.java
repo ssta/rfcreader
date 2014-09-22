@@ -25,6 +25,7 @@ package com.clothcat.rfcreader;
 
 import com.clothcat.rfcreader.network.RfcFetcher;
 import java.util.List;
+import org.rfc_editor.rfc_index.Author;
 import org.rfc_editor.rfc_index.RfcEntry;
 
 /**
@@ -38,13 +39,11 @@ public class Foo {
 
     public static void main(String[] args) throws Exception {
         XmlHelper instance = XmlHelper.getInstance();
-        List<RfcEntry> filteredList = instance.filteredListByTitle(new String[]{"TLS"});
-        System.out.println("Filtered List size is: " + filteredList.size());
-
-        filteredList = instance.filteredListByTitle(new String[]{"TLS", "dtls"});
-        System.out.println("Filtered List size is: " + filteredList.size());
-
-        filteredList = instance.filteredListByTitle(new String[]{""});
-        System.out.println("Filtered List size is: " + filteredList.size());
+        List<String> a = instance.getAllAuthorNames();
+        for(String s : a){
+            System.out.println(s);
+        }
+        System.out.println(a.size());
+        
     }
 }

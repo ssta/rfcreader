@@ -25,12 +25,16 @@ package com.clothcat.rfcreader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.rfc_editor.rfc_index.Author;
 import org.rfc_editor.rfc_index.RfcEntry;
 import org.rfc_editor.rfc_index.RfcIndex;
 
@@ -44,6 +48,7 @@ public class XmlHelper {
     private static XmlHelper instance;
     private RfcIndex index;
     private List<RfcEntry> rfcList;
+    private List<String> allAuthorNames;
 
     /**
      * Singleton
@@ -77,7 +82,7 @@ public class XmlHelper {
     }
 
     /**
-     * Filters the list of RfcEntry by searching the title (case-inseitively)
+     * Filters the list of RfcEntry by searching the title (case-insensitively)
      * for the search terms given.
      *
      * @param searchTerms An array of terms to be searched for. All terms must
@@ -92,6 +97,24 @@ public class XmlHelper {
                     matches = false;
                 }
             }
+
+            if (matches) {
+                filteredList.add(re);
+            }
+        }
+        return filteredList;
+    }
+
+    public List<RfcEntry> filteredListByAuthor(String author) {
+        List<RfcEntry> filteredList = new ArrayList<>();
+        for (RfcEntry re : getRfcList()) {
+            boolean matches = false;
+            for (Author a : re.getAuthor()) {
+                if (a.getName().toLowerCase().contains(author.toLowerCase())) {
+                    matches = true;
+                }
+            }
+
             if (matches) {
                 filteredList.add(re);
             }
@@ -109,4 +132,106 @@ public class XmlHelper {
         return instance;
     }
 
+    /**
+     * @return the allAuthorNames
+     */
+    public List<String> getAllAuthorNames() {
+        if (allAuthorNames == null) {
+            // we want to sort by surname, then by initial so we need
+            // a custom comparator
+            Comparator<String> comparator = new Comparator<String>() {
+
+                @Override
+                public int compare(String s1, String s2) {
+                    // guard against strings with trailing .
+                    if (s1.endsWith(".")) {
+                        s1 = s1.substring(0, s1.length() - 1);
+                    }
+                    if (s2.endsWith(".")) {
+                        s2 = s2.substring(0, s2.length() - 1);
+                    }
+                    // find the last . which (ought to) delimit the initials 
+                    // from the surname
+                    int i1 = s1.lastIndexOf(".");
+                    int i2 = s2.lastIndexOf(".");
+                    String sn1, sn2;
+
+                    if (i1 < 0) {
+                        sn1 = s1.trim();
+                    } else {
+                        sn1 = s1.substring(i1 + 1).trim();
+                    }
+                    if (i2 < 0) {
+                        sn2 = s2.trim();
+                    } else {
+                        sn2 = s2.substring(i2 + 1).trim();
+                    }
+
+                    // compare surnames
+                    int res = sn1.compareToIgnoreCase(sn2);
+                    // if surnames are the same compare initials
+                    if (res == 0) {
+                        return s1.trim().compareToIgnoreCase(s2.trim());
+                    } else {
+                        return res;
+                    }
+                }
+            };
+            SortedSet<String> set = new TreeSet<>(comparator);
+            for (RfcEntry re : getRfcList()) {
+                for (Author a : re.getAuthor()) {
+                    set.add(a.getName().trim());
+                }
+            }
+
+            allAuthorNames = new ArrayList<>(set);
+        }
+
+        return allAuthorNames;
+    }
+
+    public static void main(String[] args) {
+        String s1 = "Audio-Video Transport Working Group";
+        String s2 = "D. Aimmerman";
+        Comparator<String> comparator = new Comparator<String>() {
+
+            @Override
+            public int compare(String s1, String s2) {
+                // guard against strings with trailing .
+                if (s1.endsWith(".")) {
+                    s1 = s1.substring(0, s1.length() - 1);
+                }
+                if (s2.endsWith(".")) {
+                    s2 = s2.substring(0, s2.length() - 1);
+                }
+                // find the last . which (ought to) delimit the initials 
+                // from the surname
+                int i1 = s1.lastIndexOf(".");
+                int i2 = s2.lastIndexOf(".");
+                String sn1, sn2;
+
+                if (i1 < 0) {
+                    sn1 = s1.trim();
+                } else {
+                    sn1 = s1.substring(i1 + 1).trim();
+                }
+                if (i2 < 0) {
+                    sn2 = s2.trim();
+                } else {
+                    sn2 = s2.substring(i2 + 1).trim();
+                }
+
+                // compare surnames
+                int res = sn1.compareToIgnoreCase(sn2);
+                // if surnames are the same compare initials
+                if (res == 0) {
+                    return s1.trim().compareToIgnoreCase(s2.trim());
+                } else {
+                    return res;
+                }
+            }
+        };
+        int i = comparator.compare(s1, s2);
+        System.out.println(i);
+    }
 }
