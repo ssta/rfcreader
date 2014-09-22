@@ -25,14 +25,17 @@ package com.clothcat.rfcreader;
 
 import com.clothcat.rfcreader.network.RfcFetcher;
 
-/** Test class that will go away once the project is done.
+/**
+ * Test class that will go away once the project is done.
  *
- * TODO -- ONLY FOR USE DORUNG DEVVELOPMENT
+ * TODO -- ONLY FOR USE DURING DEVVELOPMENT
+ *
  * @author ssta
  */
 public class Foo {
 
     public static void main(String[] args) throws Exception {
+        RfcFetcher.fetchRfc(1918);
         RfcFetcher.fetchRfc(1918);
     }
 }

@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package com.clothcat.rfcreader.network;
 
+import com.clothcat.rfcreader.Constants;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -49,8 +49,9 @@ public class RfcFetcher {
      *
      */
     public static void fetchIndex(boolean safe) throws FileAlreadyExistsException {
+        makeDirs();
         // TODO handle exceptions better
-        String url = "ftp://ftp.ietf.org/ietf-online-proceedings/RFCs_with_extra_files/rfc-index.xml";
+        String url = Constants.RFC_INDEX_URL;
         if (safe) {
             fetchIndexSafely(url);
         } else {
@@ -60,7 +61,7 @@ public class RfcFetcher {
 
     private static void fetchIndexSafely(String url) throws FileAlreadyExistsException {
         // TODO handle exceptions better
-        File f = new File("rfc-index.xml");
+        File f = new File(Constants.RFC_INDEX_LOCAL_NAME);
         if (f.exists()) {
             throw new FileAlreadyExistsException(f.getAbsolutePath());
         } else {
@@ -75,45 +76,6 @@ public class RfcFetcher {
         }
     }
 
-    /**
-     * Fetch the RFC referred to by number.
-     *
-     * @param num The RFC to fetch
-     * @throws java.nio.file.FileAlreadyExistsException
-     */
-    public static void fetchRfc(int num) throws FileAlreadyExistsException {
-        fetchRfc(num, false);
-    }
-
-    /**
-     * Fetch the RFC referred to by number.
-     *
-     * @param num The RFC to fetch
-     * @param overwrite Whether to overwrite any existing file.
-     * @throws java.nio.file.FileAlreadyExistsException
-     */
-    public static void fetchRfc(int num, boolean overwrite) throws FileAlreadyExistsException {
-        String base_location = "ftp://ftp.rfc-editor.org/in-notes/";
-        String fname = "rfc" + num + ".txt";
-        File f = new File(fname);
-        if (f.exists()) {
-            if (!overwrite) {
-                throw new FileAlreadyExistsException(f.getAbsolutePath());
-            } else {
-                f.delete();
-            }
-        }
-
-        try {
-            URL u = new URL(base_location + fname);
-            FileUtils.copyURLToFile(u, f);
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(RfcFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(RfcFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     private static void fetchIndexUnsafely(String url) {
         // TODO handle exceptions better
         try {
@@ -125,5 +87,59 @@ public class RfcFetcher {
         } catch (FileAlreadyExistsException ex) {
             Logger.getLogger(RfcFetcher.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * Fetch the RFC referred to by number.
+     *
+     * @param num The RFC to fetch
+     * @throws java.nio.file.FileAlreadyExistsException
+     */
+    public static void fetchRfc(int num) throws FileAlreadyExistsException {
+        makeDirs();
+        fetchRfc(num, false);
+    }
+
+    /**
+     * Fetch the RFC referred to by number.
+     *
+     * @param num The RFC to fetch
+     * @param overwrite Whether to overwrite any existing file.
+     * @throws java.nio.file.FileAlreadyExistsException
+     */
+    public static void fetchRfc(int num, boolean overwrite) throws FileAlreadyExistsException {
+        makeDirs();
+        String base_location = Constants.RFC_BASE_LOCATION;
+        String s = "rfc" + num + ".txt";
+        File filename = new File(Constants.RFC_CACHE + s);
+        if (filename.exists()) {
+            if (!overwrite) {
+                throw new FileAlreadyExistsException(filename.getAbsolutePath());
+            } else {
+                filename.delete();
+            }
+        }
+
+        try {
+            URL u = new URL(base_location + s);
+            FileUtils.copyURLToFile(u, filename);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(RfcFetcher.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(RfcFetcher.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Creates the local directories required if they don't already exist. A bit
+     * wasteful to keep trying to create them all the time perhaps, but better
+     * than then not being there when needed...
+     */
+    private static void makeDirs() {
+        File f;
+        f = new File(Constants.RFC_CACHE);
+        f.mkdirs();
+        f = new File(Constants.RFC_CONFIG);
+        f.mkdirs();
     }
 }
